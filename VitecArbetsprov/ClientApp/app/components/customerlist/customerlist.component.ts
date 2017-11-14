@@ -1,17 +1,15 @@
 ﻿import { Component, Inject } from '@angular/core';
 import { Http } from '@angular/http';
+import { Customer } from '../customer/customer';
 
 @Component({
     selector: 'customers',
     templateUrl: './customerlist.component.html'
 })
 export class CustomerListComponent {
-    public customers: Customer[];
-    public page: number = 0;
+    public customerPage: CustomerPage;
     public itemsPerPage: number = 10;
     public filter: string = "";
-    public pageCount: number = 0;
-    public userCount: number = 0;
 
     private _http: Http;
     private _baseUrl: string;
@@ -19,32 +17,12 @@ export class CustomerListComponent {
     constructor(http: Http, @Inject('BASE_URL') baseUrl: string) {
         this._http = http;
         this._baseUrl = baseUrl;
-        this.refreshPage();
+        this.getPage(0);
     }
 
-    private refreshPage() {
-        if (this.filter == "") {
-            this.getCurrentPage();
-        } else {
-            this.getCurrentPageFiltered();
-        }
-    }
-
-    private getPageCount() {
-        this._http.get(this._baseUrl + '/customer/pagecount?resultsPerPage=' + this.itemsPerPage).subscribe(result => {
-            this.pageCount = Number(result.text);
-        }, error => console.error(error));   
-    }
-    
-    private getCurrentPage() {
-        this._http.get(this._baseUrl + '/customer/getpage?resultsPerPage=' + this.itemsPerPage + '&page=' + this.page).subscribe(result => {
-            this.customers = result.json() as Customer[];
-        }, error => console.error(error));        
-    }
-
-    private getCurrentPageFiltered() {
-        this._http.get(this._baseUrl + '/customer/getpagefiltered?resultsPerPage=' + this.itemsPerPage + '&page=' + this.page + '&filter=' + this.filter).subscribe(result => {
-            this.customers = result.json() as Customer[];
+    private getPage(pageNumber: number) {
+        this._http.get(this._baseUrl + '/customer/getpagefiltered?resultsPerPage=' + this.itemsPerPage + '&page=' + pageNumber + '&filter=' + this.filter).subscribe(result => {
+            this.customerPage = result.json() as CustomerPage;
         }, error => console.error(error));
     }
 
@@ -54,34 +32,37 @@ export class CustomerListComponent {
 
     public delete(id: number) {
         this._http.get(this._baseUrl + '/customer/delete?id=' + id).subscribe(result => {
-            this.refreshPage();
+            this.getPage(this.customerPage.pageNumber);
         }, error => console.error(error));
     }
 
     public nextPage() {
-        this.page++;
-        this.refreshPage();
+        this.getPage(this.customerPage.pageNumber + 1);
     }
     
     public previousPage() {
-        if (this.page > 0) {
-            this.page--;
-            this.refreshPage();
+        if (this.customerPage.pageNumber > 0) {
+            this.getPage(this.customerPage.pageNumber - 1);
         }
-        
+    }
+
+    private getCurrentPageNumber() {
+        if (!this.customerPage) {
+            return 0;
+        } else {
+            return this.customerPage.pageNumber;
+        }
     }
 
     public applyFilter() {
         this.filter = (<HTMLInputElement>document.getElementById('filter')).value;
         console.debug(this.filter);
-        this.refreshPage();
+        this.getPage(0);
     }
 }
 
-interface Customer {
-    id: number;
-    firstName: string;
-    lastName: string;
-    socialSecurityNumber: number;
-    category: string;
+interface CustomerPage {
+    customers: Customer[];
+    pageNumber: number;
+    totalPageCount: number;
 }

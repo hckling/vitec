@@ -51,12 +51,18 @@ namespace VitecArbetsprov.Controllers
         [HttpGet]
         public ActionResult PageCount(int resultsPerPage)
         {
-            if (resultsPerPage > 0)
+            return new ObjectResult(CalculatePageCount(resultsPerPage));
+        }
+
+        private int CalculatePageCount(int resultsPerPage)
+        {
+            if (resultsPerPage > 1)
             {
-                return new ObjectResult(Math.Ceiling((double)(_customers.Count / resultsPerPage)));
-            } else
+                return (int) Math.Ceiling((double)(_customers.Count / resultsPerPage));
+            }
+            else
             {
-                return new ObjectResult(_customers.Count);
+                return _customers.Count;
             }
         }
 
@@ -82,7 +88,13 @@ namespace VitecArbetsprov.Controllers
         [HttpGet]
         public ActionResult GetPage(int resultsPerPage, int page)
         {
-            return new ObjectResult(GetRange(_customers, page, resultsPerPage));
+            CustomerPage customerPage = new CustomerPage();
+
+            customerPage.Customers = GetRange(_customers, page, resultsPerPage);
+            customerPage.PageNumber = page;
+            customerPage.TotalPageCount = CalculatePageCount(resultsPerPage);
+
+            return new ObjectResult(customerPage);
         }
 
         [HttpGet]

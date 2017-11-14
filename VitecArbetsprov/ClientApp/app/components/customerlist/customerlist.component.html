@@ -18,7 +18,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let customer of customers">
+        <tr *ngFor="let customer of currentPage.customers">
             <td>{{ customer.id }}</td>
             <td>{{ customer.firstName }}</td>
             <td>{{ customer.lastName }}</td>
@@ -29,4 +29,4 @@
     </tbody>
 </table>
 
-<button (click)="previousPage()">Previous</button> Page: {{page}} of {{pageCount}}, Items per page: {{itemsPerPage}} <button (click)="nextPage()">Next</button>
+<button (click)="previousPage()">Previous</button> Page: {{customerPage.pageNumber}} of {{customerPage.totalPageCount}}, Items per page: {{itemsPerPage}} <button (click)="nextPage()">Next</button>

@@ -1,25 +1,24 @@
-﻿import { Component, Inject } from '@angular/core';
+﻿import { Component, OnInit, Inject } from '@angular/core';
 import { Http } from '@angular/http'
+import { Customer } from './customer';
+import { CustomerService } from './customer.service';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
+    moduleId: 'module.id',
+    selector: 'customer',
     templateUrl: './customer.component.html'
 })
 export class CustomerComponent {
-    public id: number = 0;
-    public firstName: string = "";
-    public lastName: string = "";
-    public socialSecurityNumber: string = "";
-    public category: string = "";
+    customer = new Customer(0, '', '', '', '');
+    
+    constructor(private customerService: CustomerService) { }
+    
+    public createCustomer() {
+        if (!this.customer) {
+            return
+        }
 
-    private _http: Http;
-    private _baseUrl: string;
-
-    constructor(http: Http, @Inject('BASE_URL') baseUrl: string) {
-        this._http = http;
-        this._baseUrl = baseUrl;
-    }
-
-    public delete() {
-        this._http.get(this._baseUrl + '/customer/delete/' + this.id).subscribe(result => { }, error => console.error(error));
+        this.customerService.addCustomer(this.customer);
     }
 }

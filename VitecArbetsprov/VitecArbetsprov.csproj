@@ -23,11 +23,14 @@
 
   <ItemGroup>
     <None Remove="ClientApp\app\components\customer\customer.component.ts" />
+    <None Remove="ClientApp\app\components\customer\customer.ts" />
   </ItemGroup>
 
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\app\components\customerlist\customerlist.component.ts" />
     <TypeScriptCompile Include="ClientApp\app\components\customer\customer.component.ts" />
+    <TypeScriptCompile Include="ClientApp\app\components\customer\customer.service.ts" />
+    <TypeScriptCompile Include="ClientApp\app\components\customer\customer.ts" />
   </ItemGroup>
 
   <ItemGroup>

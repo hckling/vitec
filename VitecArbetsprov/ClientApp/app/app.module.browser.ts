@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppModuleShared } from './app.module.shared';
 import { AppComponent } from './components/app/app.component';
@@ -7,7 +8,9 @@ import { AppComponent } from './components/app/app.component';
     bootstrap: [ AppComponent ],
     imports: [
         BrowserModule,
-        AppModuleShared
+        AppModuleShared,
+        FormsModule,
+        ReactiveFormsModule
     ],
     providers: [
         { provide: 'BASE_URL', useFactory: getBaseUrl }

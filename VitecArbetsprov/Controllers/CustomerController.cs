@@ -56,11 +56,11 @@ namespace VitecArbetsprov.Controllers
                 customer.Category = collection["Category"];
                 customer.SocialSecurityNumber = collection["SocialSecurityNumber"];
 
-                return RedirectToAction(nameof(Index));
+                return Ok();
             }
             catch
             {
-                return View();
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
 

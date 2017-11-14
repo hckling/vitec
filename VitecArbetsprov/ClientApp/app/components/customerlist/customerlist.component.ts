@@ -10,6 +10,8 @@ export class CustomerListComponent {
     public page: number = 0;
     public itemsPerPage: number = 10;
     public filter: string = "";
+    public pageCount: number = 0;
+    public userCount: number = 0;
 
     private _http: Http;
     private _baseUrl: string;
@@ -26,6 +28,12 @@ export class CustomerListComponent {
         } else {
             this.getCurrentPageFiltered();
         }
+    }
+
+    private getPageCount() {
+        this._http.get(this._baseUrl + '/customer/pagecount?resultsPerPage=' + this.itemsPerPage).subscribe(result => {
+            this.pageCount = Number(result.text);
+        }, error => console.error(error));   
     }
     
     private getCurrentPage() {

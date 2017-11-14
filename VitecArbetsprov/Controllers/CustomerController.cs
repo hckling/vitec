@@ -48,9 +48,16 @@ namespace VitecArbetsprov.Controllers
             return new ObjectResult(_customers.Count);
         }
 
-        public ActionResult PageCount(int itemsPerPage)
+        [HttpGet]
+        public ActionResult PageCount(int resultsPerPage)
         {
-            return new ObjectResult(Math.Ceiling((double)(_customers.Count / itemsPerPage)));
+            if (resultsPerPage > 0)
+            {
+                return new ObjectResult(Math.Ceiling((double)(_customers.Count / resultsPerPage)));
+            } else
+            {
+                return new ObjectResult(_customers.Count);
+            }
         }
 
         public ActionResult SaveChanges()

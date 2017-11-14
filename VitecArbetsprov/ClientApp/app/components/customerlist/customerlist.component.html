@@ -29,10 +29,12 @@
     </tbody>
 </table>
 
-<button (click)="previousPage()" id="btnPrevPage">Previous</button> 
-Page: {{customerPage.pageNumber + 1}} of {{customerPage.totalPageCount}}, 
-Items per page: 
-<select id="cmbItemsPerPage" [(ngModel)]="itemsPerPage" (ngModelChange)="onItemsPerPageChanged()">
-    <option *ngFor="let itemCount of itemCountOptions" [value]="itemCount" [selected]="itemCount == itemsPerPage">{{ itemCount }}</option>
-</select> 
-<button (click)="nextPage()" id="btnNextPage">Next</button>
+<div>
+    <button (click)="previousPage()" id="btnPrevPage">Previous</button> 
+    Page: {{ customerPage.pageNumber + 1 }} of {{ customerPage.totalPageCount }}, 
+    Items per page: 
+    <select id="cmbItemsPerPage" [(ngModel)]="itemsPerPage" (ngModelChange)="onItemsPerPageChanged()">
+        <option *ngFor="let itemCount of itemCountOptions" [value]="itemCount" [selected]="itemCount == itemsPerPage">{{ itemCount }}</option>
+    </select> 
+    <button (click)="nextPage()" id="btnNextPage">Next</button>
+</div>

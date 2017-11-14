@@ -6,8 +6,7 @@ import { Customer } from '../customer/customer';
     selector: 'customers',
     templateUrl: './customerlist.component.html'
 })
-export class CustomerListComponent implements OnInit {
-    
+export class CustomerListComponent implements OnInit {    
     public customerPage: CustomerPage = new CustomerPage();
     public itemsPerPage: number = 10;
     public filter: string = "";

@@ -1,10 +1,10 @@
 ﻿<h1>Create customer</h1>
 
 <form ng-submit="createCustomer()">
-    <p><strong>First name:</strong> <input type="text" required id="txtFirstName" /> </p>
-    <p><strong>Last name:</strong> <input type="text" required id="txtLastName" /> </p>
-    <p><strong>Social security number:</strong> <input type="text" required id="txtSocialSecurityNumber" /> </p>
-    <p><strong>Category:</strong> <input type="text" id="txtCategory" /> </p>
+    <p><strong>First name:</strong> <input type="text" [(ngModel)]="customer.firstName" name="txtFirstName" required id="txtFirstName" /> </p>
+    <p><strong>Last name:</strong> <input type="text" [(ngModel)]="customer.lastName" name="txtLastName" required id="txtLastName" /> </p>
+    <p><strong>Social security number:</strong> <input type="text" [(ngModel)]="customer.socialSecurityNumber" name="txtSocialSecurityNumber" required id="txtSocialSecurityNumber" /> </p>
+    <p><strong>Category:</strong> <input type="text" [(ngModel)]="customer.category" name="txtCategory" id="txtCategory" /> </p>
 
     <button type="submit" (click)="createCustomer()">Add</button>
 </form>

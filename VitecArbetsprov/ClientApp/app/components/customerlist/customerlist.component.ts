@@ -15,44 +15,34 @@ export class CustomerListComponent implements OnInit {
     public itemsPerPage: number = 10;
     public itemCountOptions: number[] = [];
 
-    private btnNext: HTMLInputElement;
-    private btnPrev: HTMLInputElement;
+    public atFirstPage: boolean = false;
+    public atLastPage: boolean = false;
     
     ngOnInit(): void {
+        // TODO: Make nicer...
         this.itemCountOptions.push(10);
         this.itemCountOptions.push(50);
         this.itemCountOptions.push(100);
 
-        this.customerService.getPage(0, this.itemsPerPage, this.customerFilter).subscribe(page => this.customerPage = page);
+        this.customerService.getPage(0, this.itemsPerPage, this.customerFilter).subscribe(page => {
+            this.customerPage = page;
+            this.updateButtonAvailability();
+        });
     }
 
     constructor(private customerService: CustomerService) { }
 
     private getPage(pageNumber: number) {
-        this.customerService.getPage(pageNumber, this.itemsPerPage, this.customerFilter).subscribe(page => this.customerPage = page);       
-        this.updateButtonAvailability();
+        this.customerService.getPage(pageNumber, this.itemsPerPage, this.customerFilter).subscribe(page => {
+            this.customerPage = page;
+            this.updateButtonAvailability();
+        });        
     }
 
     private updateButtonAvailability() {
-        this.getNextPageButton().disabled = (this.customerPage.pageNumber + 1) >= this.customerPage.totalPageCount;
-        this.getPrevPageButton().disabled = this.customerPage.pageNumber == 0;
-    }
-
-    public getNextPageButton() {
-        if (!this.btnNext) {
-            this.btnNext = <HTMLInputElement>document.getElementById("btnNextPage");
-        }     
-
-        return this.btnNext;
-    }
-
-    public getPrevPageButton() {
-        if (!this.btnPrev) {
-            this.btnPrev = <HTMLInputElement>document.getElementById("btnPrevPage");
-        }
-
-        return this.btnPrev;
-    }
+        this.atLastPage = (this.customerPage.pageNumber + 1) >= this.customerPage.totalPageCount;
+        this.atFirstPage = this.customerPage.pageNumber == 0;
+    }    
 
     public delete(id: number) {
         this.customerService.delete(id).subscribe(() => this.refreshPage());

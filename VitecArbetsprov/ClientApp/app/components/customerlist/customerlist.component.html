@@ -49,6 +49,6 @@
     <select id="cmbItemsPerPage" [(ngModel)]="itemsPerPage" (ngModelChange)="onItemsPerPageChanged()">
         <option *ngFor="let itemCount of itemCountOptions" [value]="itemCount" [selected]="itemCount == itemsPerPage">{{ itemCount }}</option>
     </select> 
-    <button (click)="nextPage()" id="btnNextPage">Next</button>
-    <button (click)="saveChanges()" id="btnSaveChanges">Save changes</button>
+    <button (click)="nextPage()" id="btnNextPage" [disabled]="atLastPage" >Next</button>
+    <button (click)="saveChanges()" [disabled]="atFirstPage" id="btnSaveChanges">Save changes</button>
 </div>

@@ -21,18 +21,16 @@ namespace VitecArbetsprov.Controllers
         {
             if (_customers == null)
             {
-                ReadCustomers();
+                ReadCustomersFromFile();
             }
         }
 
-        // POST: Customer/Create
         [HttpPost]
         public ActionResult Create([FromBody] Customer customer)
         {
             try
             {
-                _highestId++;
-                customer.Id = _highestId;
+                UpdateCustomerId(customer);
 
                 _customers.Add(customer);
 
@@ -44,15 +42,10 @@ namespace VitecArbetsprov.Controllers
             }
         }
 
-        public ActionResult CustomerCount()
+        private void UpdateCustomerId(Customer customer)
         {
-            return new ObjectResult(_customers.Count);
-        }
-
-        [HttpGet]
-        public ActionResult PageCount(int resultsPerPage)
-        {
-            return new ObjectResult(CalculatePageCount(resultsPerPage));
+            _highestId++;
+            customer.Id = _highestId;
         }
 
         private int CalculatePageCount(int resultsPerPage)
@@ -70,6 +63,13 @@ namespace VitecArbetsprov.Controllers
         [HttpGet]
         public ActionResult SaveChanges()
         {
+            SaveCustomersToFile();
+
+            return Ok();
+        }
+
+        private static void SaveCustomersToFile()
+        {
             var serializer = new XmlSerializer(typeof(List<Customer>));
 
             System.IO.File.Delete(REPOSITORY_PATH);
@@ -77,11 +77,9 @@ namespace VitecArbetsprov.Controllers
             {
                 serializer.Serialize(fs, _customers);
             }
-
-            return Ok();
         }
 
-        // GET: Customer/Delete/5
+        [HttpGet]
         public ActionResult Delete(int id)
         {
             _customers.RemoveAll(c => c.Id == id);
@@ -99,7 +97,7 @@ namespace VitecArbetsprov.Controllers
         {
             CustomerPage customerPage = new CustomerPage();
 
-            customerPage.Customers = GetRange(_customers, page, resultsPerPage);
+            customerPage.Customers = GetCustomersOnPage(_customers, page, resultsPerPage);
             customerPage.PageNumber = page;
             customerPage.TotalPageCount = CalculatePageCount(resultsPerPage);
 
@@ -112,15 +110,22 @@ namespace VitecArbetsprov.Controllers
             if (filter != null && filter.Length > 0)
             {
                 var filteredCustomers = _customers.Where(c => c.Matches(filter)).ToList<Customer>();
-                return new ObjectResult(new CustomerPage(GetRange(filteredCustomers, page, resultsPerPage), page, (int) Math.Ceiling((float) filteredCustomers.Count / resultsPerPage)));
+
+                var filteredCustomersOnPage = GetCustomersOnPage(filteredCustomers, page, resultsPerPage);
+                var totalNumberOfPages = (int) Math.Ceiling((float) filteredCustomers.Count / resultsPerPage);
+
+                return new ObjectResult(new CustomerPage(filteredCustomersOnPage, page, totalNumberOfPages));
             }
             else
             {
-                return new ObjectResult(new CustomerPage(GetRange(_customers, page, resultsPerPage), page, (int)Math.Ceiling((float)_customers.Count / resultsPerPage)));
+                var customersOnPage = GetCustomersOnPage(_customers, page, resultsPerPage);
+                var totalNumberOfPages = (int) Math.Ceiling((float)_customers.Count / resultsPerPage);
+
+                return new ObjectResult(new CustomerPage(customersOnPage, page, totalNumberOfPages));
             }
         }
 
-        private List<Customer> GetRange(List<Customer> customers, int page, int itemsPerPage)
+        private List<Customer> GetCustomersOnPage(List<Customer> customers, int page, int itemsPerPage)
         {
             var startIndex = Math.Max(Math.Min(page * itemsPerPage, customers.Count - 1), 0);
             var length = Math.Min(itemsPerPage, customers.Count - startIndex);
@@ -128,7 +133,7 @@ namespace VitecArbetsprov.Controllers
             return customers.GetRange(startIndex, length);
         }
 
-        private void ReadCustomers()
+        private void ReadCustomersFromFile()
         {
             using (StreamReader reader = new StreamReader(REPOSITORY_PATH))
             {

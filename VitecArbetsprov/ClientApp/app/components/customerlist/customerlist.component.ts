@@ -27,7 +27,7 @@ export class CustomerListComponent implements OnInit {
         this.customerService.getPage(0, this.itemsPerPage, this.customerFilter).subscribe(page => {
             this.customerPage = page;
             this.updateButtonAvailability();
-        });
+        }, error => console.error(error));
     }
 
     constructor(private customerService: CustomerService) { }
@@ -36,7 +36,7 @@ export class CustomerListComponent implements OnInit {
         this.customerService.getPage(pageNumber, this.itemsPerPage, this.customerFilter).subscribe(page => {
             this.customerPage = page;
             this.updateButtonAvailability();
-        });        
+        }, error => console.error(error));        
     }
 
     private updateButtonAvailability() {

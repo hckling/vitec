@@ -36,11 +36,6 @@ export class CustomerListComponent implements OnInit {
             this.getNextPageButton().disabled = (this.customerPage.pageNumber + 1) >= this.customerPage.totalPageCount;
             this.getPrevPageButton().disabled = this.customerPage.pageNumber == 0;
         }, error => console.error(error));
-        /*this._http.get(this._baseUrl + '/customer/getpagefiltered?resultsPerPage=' + this.itemsPerPage + '&page=' + pageNumber + '&filter=' + this.customerFilter.nameFilter).subscribe(result => {
-            this.customerPage = result.json() as CustomerPage;
-            this.getNextPageButton().disabled = (this.customerPage.pageNumber + 1) >= this.customerPage.totalPageCount;
-            this.getPrevPageButton().disabled = this.customerPage.pageNumber == 0;
-        }, error => console.error(error));*/
     }
 
     public getNextPageButton() {

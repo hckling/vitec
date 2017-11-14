@@ -10,18 +10,14 @@
 <table class='table' *ngIf="customerPage">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>First name</th>
-            <th>Last name</th>
+            <th>Name</th>
             <th>Social security number</th>
             <th>Category</th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor="let customer of customerPage.customers">
-            <td>{{ customer.id }}</td>
-            <td>{{ customer.firstName }}</td>
-            <td>{{ customer.lastName }}</td>
+            <td>{{ customer.firstName }} {{ customer.lastName }}</td>
             <td>{{ customer.socialSecurityNumber }}</td>
             <td>{{ customer.category }}</td>
             <td><button (click)="delete(customer.id)">Delete</button></td>
@@ -37,4 +33,5 @@
         <option *ngFor="let itemCount of itemCountOptions" [value]="itemCount" [selected]="itemCount == itemsPerPage">{{ itemCount }}</option>
     </select> 
     <button (click)="nextPage()" id="btnNextPage">Next</button>
+    <button (click)="saveChanges()" id="btnSaveChanges">Save changes</button>
 </div>

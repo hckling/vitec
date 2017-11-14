@@ -13,6 +13,7 @@ namespace VitecArbetsprov.Controllers
 {
     public class CustomerController : Controller
     {
+        private const string REPOSITORY_PATH = ".\\data\\personer.xml";
         private static List<Customer> _customers;
         private int _highestId = 0;
 
@@ -66,9 +67,17 @@ namespace VitecArbetsprov.Controllers
             }
         }
 
+        [HttpGet]
         public ActionResult SaveChanges()
         {
-            // TODO: Write to file
+            var serializer = new XmlSerializer(typeof(List<Customer>));
+
+            System.IO.File.Delete(REPOSITORY_PATH);
+            using (FileStream fs = new FileStream(REPOSITORY_PATH, FileMode.OpenOrCreate))
+            {
+                serializer.Serialize(fs, _customers);
+            }
+
             return Ok();
         }
 
@@ -121,7 +130,7 @@ namespace VitecArbetsprov.Controllers
 
         private void ReadCustomers()
         {
-            using (StreamReader reader = new StreamReader(".\\data\\personer.xml"))
+            using (StreamReader reader = new StreamReader(REPOSITORY_PATH))
             {
                 var serializer = new XmlSerializer(typeof(List<Customer>), new XmlRootAttribute("ArrayOfPerson"));
                 _customers = (List<Customer>)serializer.Deserialize(reader);

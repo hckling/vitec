@@ -82,6 +82,12 @@ export class CustomerListComponent implements OnInit {
         console.debug(this.filter);
         this.getPage(0);
     }
+
+    public saveChanges() {
+        this._http.get(this._baseUrl + '/customer/savechanges').subscribe(result => {
+            
+        }, error => console.error(error));
+    }
 }
 
 class CustomerPage {

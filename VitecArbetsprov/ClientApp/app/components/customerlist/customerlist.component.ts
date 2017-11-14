@@ -7,13 +7,13 @@ import { Customer } from '../customer/customer';
     templateUrl: './customerlist.component.html'
 })
 export class CustomerListComponent {
-    public customerPage: CustomerPage;
+    public customerPage: CustomerPage = new CustomerPage();
     public itemsPerPage: number = 10;
     public filter: string = "";
 
     private _http: Http;
     private _baseUrl: string;
-
+    
     constructor(http: Http, @Inject('BASE_URL') baseUrl: string) {
         this._http = http;
         this._baseUrl = baseUrl;
@@ -23,6 +23,8 @@ export class CustomerListComponent {
     private getPage(pageNumber: number) {
         this._http.get(this._baseUrl + '/customer/getpagefiltered?resultsPerPage=' + this.itemsPerPage + '&page=' + pageNumber + '&filter=' + this.filter).subscribe(result => {
             this.customerPage = result.json() as CustomerPage;
+            (<HTMLInputElement>document.getElementById("btnNextPage")).disabled = (this.customerPage.pageNumber + 1) >= this.customerPage.totalPageCount;
+            (<HTMLInputElement>document.getElementById("btnPrevPage")).disabled = this.customerPage.pageNumber == 0;
         }, error => console.error(error));
     }
 
@@ -61,8 +63,8 @@ export class CustomerListComponent {
     }
 }
 
-interface CustomerPage {
-    customers: Customer[];
-    pageNumber: number;
-    totalPageCount: number;
+class CustomerPage {
+    public customers: Customer[];
+    public pageNumber: number;
+    public totalPageCount: number;
 }

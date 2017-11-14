@@ -1,13 +1,13 @@
 ﻿<h1>Customers</h1>
 
-<p *ngIf="!customers"><em>Loading...</em></p>
+<p *ngIf="!customerPage"><em>Loading...</em></p>
 
-<form *ngIf="customers">
+<form *ngIf="customerPage">
     <input id="filter" type="text" name="filter" /> 
     <button (click)="applyFilter()">Apply</button>
 </form>
 
-<table class='table' *ngIf="customers">
+<table class='table' *ngIf="customerPage">
     <thead>
         <tr>
             <th>ID</th>
@@ -18,7 +18,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let customer of currentPage.customers">
+        <tr *ngFor="let customer of customerPage.customers">
             <td>{{ customer.id }}</td>
             <td>{{ customer.firstName }}</td>
             <td>{{ customer.lastName }}</td>
@@ -29,4 +29,4 @@
     </tbody>
 </table>
 
-<button (click)="previousPage()">Previous</button> Page: {{customerPage.pageNumber}} of {{customerPage.totalPageCount}}, Items per page: {{itemsPerPage}} <button (click)="nextPage()">Next</button>
+<button (click)="previousPage()" id="btnPrevPage">Previous</button> Page: {{customerPage.pageNumber + 1}} of {{customerPage.totalPageCount}}, Items per page: {{itemsPerPage}} <button (click)="nextPage()" id="btnNextPage">Next</button>

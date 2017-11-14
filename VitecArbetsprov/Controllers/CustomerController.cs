@@ -100,14 +100,14 @@ namespace VitecArbetsprov.Controllers
         [HttpGet]
         public ActionResult GetPageFiltered(int resultsPerPage, int page, string filter)
         {
-            if (filter.Length > 0)
+            if (filter != null && filter.Length > 0)
             {
                 var filteredCustomers = _customers.Where(c => c.Matches(filter)).ToList<Customer>();
-                return new ObjectResult(GetRange(filteredCustomers, page, resultsPerPage));
+                return new ObjectResult(new CustomerPage(GetRange(filteredCustomers, page, resultsPerPage), page, (int) Math.Ceiling((float) filteredCustomers.Count / resultsPerPage)));
             }
             else
             {
-                return new ObjectResult(GetRange(_customers, page, resultsPerPage));
+                return new ObjectResult(new CustomerPage(GetRange(_customers, page, resultsPerPage), page, (int)Math.Ceiling((float)_customers.Count / resultsPerPage)));
             }
         }
 

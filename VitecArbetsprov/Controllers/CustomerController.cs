@@ -15,7 +15,7 @@ namespace VitecArbetsprov.Controllers
     {
         private const string REPOSITORY_PATH = ".\\data\\personer.xml";
         private static List<Customer> _customers;
-        private int _highestId = 0;
+        private static int _highestId = 0;
 
         public CustomerController()
         {
@@ -34,7 +34,7 @@ namespace VitecArbetsprov.Controllers
 
                 _customers.Add(customer);
 
-                return Ok();
+                return new ObjectResult(customer);
             }
             catch
             {

@@ -1,6 +1,8 @@
 ﻿import { Component, Inject, OnInit } from '@angular/core';
-import { Http, Headers, RequestOptions } from '@angular/http';
+import { CustomerService } from '../customer/customer.service';
 import { Customer } from '../customer/customer';
+import { CustomerFilter } from './customerfilter';
+import { CustomerPage } from './customerpage';
 
 @Component({
     selector: 'customers',
@@ -20,22 +22,20 @@ export class CustomerListComponent implements OnInit {
         this.itemCountOptions.push(10);
         this.itemCountOptions.push(50);
         this.itemCountOptions.push(100);
+
+        this.customerService.getPage(0, this.itemsPerPage, this.customerFilter).subscribe(page => this.customerPage = page);
     }
-    
-    constructor(private _http: Http, @Inject('BASE_URL') private _baseUrl: string) {
-        this.getPage(0);
-    }    
+
+    constructor(private customerService: CustomerService) { }
 
     private getPage(pageNumber: number) {
-        let body = JSON.stringify(this.customerFilter);
-        let headers = new Headers({ 'Content-Type': 'application/json' });
-        let options = new RequestOptions({ headers: headers });
+        this.customerService.getPage(pageNumber, this.itemsPerPage, this.customerFilter).subscribe(page => this.customerPage = page);       
+        this.updateButtonAvailability();
+    }
 
-        this._http.post(this._baseUrl + '/customer/getpagefiltered?resultsPerPage=' + this.itemsPerPage + '&page=' + pageNumber, body, options).subscribe(result => {
-            this.customerPage = result.json() as CustomerPage;
-            this.getNextPageButton().disabled = (this.customerPage.pageNumber + 1) >= this.customerPage.totalPageCount;
-            this.getPrevPageButton().disabled = this.customerPage.pageNumber == 0;
-        }, error => console.error(error));
+    private updateButtonAvailability() {
+        this.getNextPageButton().disabled = (this.customerPage.pageNumber + 1) >= this.customerPage.totalPageCount;
+        this.getPrevPageButton().disabled = this.customerPage.pageNumber == 0;
     }
 
     public getNextPageButton() {
@@ -55,9 +55,12 @@ export class CustomerListComponent implements OnInit {
     }
 
     public delete(id: number) {
-        this._http.get(this._baseUrl + '/customer/delete?id=' + id).subscribe(result => {
-            this.getPage(this.customerPage.pageNumber);
-        }, error => console.error(error));
+        this.customerService.delete(id).subscribe(() => this.refreshPage());
+        this.customerService.getPage(0, this.itemsPerPage, this.customerFilter);
+    }
+
+    private refreshPage() {
+        this.getPage(this.customerPage.pageNumber);
     }
 
     public nextPage() {
@@ -74,33 +77,11 @@ export class CustomerListComponent implements OnInit {
         this.getPage(0);
     }
 
-    private getCurrentPageNumber() {
-        if (!this.customerPage) {
-            return 0;
-        } else {
-            return this.customerPage.pageNumber;
-        }
-    }
-
     public applyFilter() {
         this.getPage(0);
     }
 
     public saveChanges() {
-        this._http.get(this._baseUrl + '/customer/savechanges').subscribe(result => {
-            
-        }, error => console.error(error));
+        this.customerService.saveChanges();
     }
-}
-
-class CustomerFilter {
-    constructor(public nameFilter: string, public ssnFilter: string, public categoryFilter: string) {
-
-    }
-}
-
-class CustomerPage {
-    public customers: Customer[];
-    public pageNumber: number;
-    public totalPageCount: number;
 }

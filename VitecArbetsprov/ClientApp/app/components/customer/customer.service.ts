@@ -1,32 +1,41 @@
 ﻿import { Injectable, Inject } from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import { Http, Headers, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-
+import { of } from 'rxjs/Observable/of';
 import { Customer } from './customer';
+import { CustomerPage } from '../customerlist/customerpage';
+import { CustomerFilter } from '../customerlist/customerfilter';
+
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/map'
 
 @Injectable()
 export class CustomerService {
-    private _customerUrl: string;
-    
-    constructor(private _http: Http, @Inject('BASE_URL') baseUrl: string) {
-        this._customerUrl = baseUrl + '/customer';
+    constructor(private http: Http, @Inject('BASE_URL') private baseUrl: string) { }
+
+    getPage(page: number, itemsPerPage: number, filter: CustomerFilter): Observable<CustomerPage> {
+        let body = JSON.stringify(filter);
+        let headers = new Headers({ 'Content-Type': 'application/json' });
+        let options = new RequestOptions({ headers: headers });
+        let resultPage = new CustomerPage();
+
+        return this.http.post(this.baseUrl + '/customer/getpagefiltered?resultsPerPage=' + itemsPerPage + '&page=' + page, body, options)
+            .map(result => result.json() as CustomerPage);
     }
 
-    getCustomerPage(page: number, resultsPerPage: number, filter: string = ""): Observable<Customer[]> {
-        this._http.get(this._customerUrl + '/getallfiltered?resultsPerPage=' + resultsPerPage + '&page=' + page + '&filter=' + filter).subscribe((response: Response) => {
-            return <Customer[]>response.json();
-        }, error => console.error(error));
-
-        return new Observable<Customer[]>();
+    delete(id: number): Observable<any> {
+        return this.http.get(this.baseUrl + '/customer/delete?id=' + id);
     }
 
-    addCustomer(customer: Customer) {
+    saveChanges() {
+        this.http.get(this.baseUrl + '/customer/savechanges').subscribe(result => { }, error => console.error(error));
+    }
+
+    addCustomer(customer: Customer): Observable<Customer> {
         let body = JSON.stringify(customer);
         let headers = new Headers({ 'Content-Type': 'application/json' });
         let options = new RequestOptions({ headers: headers });
 
-        return this._http.post(this._customerUrl + '/create', body, options).subscribe(result => {
-            return result.json() as Customer;
-        }, error => console.error(error));
+        return this.http.post(this.baseUrl + '/customer/create', body, options).map(result => result.json() as Customer);
     }
 }

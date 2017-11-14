@@ -3,6 +3,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppModuleShared } from './app.module.shared';
 import { AppComponent } from './components/app/app.component';
+import { CustomerService } from './components/customer/customer.service';
 
 @NgModule({
     bootstrap: [ AppComponent ],
@@ -10,10 +11,11 @@ import { AppComponent } from './components/app/app.component';
         BrowserModule,
         AppModuleShared,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
     ],
     providers: [
-        { provide: 'BASE_URL', useFactory: getBaseUrl }
+        { provide: 'BASE_URL', useFactory: getBaseUrl },
+        CustomerService
     ]
 })
 export class AppModule {

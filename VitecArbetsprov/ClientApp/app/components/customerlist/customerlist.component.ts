@@ -1,4 +1,4 @@
-﻿import { Component, Inject } from '@angular/core';
+﻿import { Component, Inject, OnInit } from '@angular/core';
 import { Http } from '@angular/http';
 import { Customer } from '../customer/customer';
 
@@ -6,30 +6,48 @@ import { Customer } from '../customer/customer';
     selector: 'customers',
     templateUrl: './customerlist.component.html'
 })
-export class CustomerListComponent {
+export class CustomerListComponent implements OnInit {
+    
     public customerPage: CustomerPage = new CustomerPage();
     public itemsPerPage: number = 10;
     public filter: string = "";
+    public itemCountOptions: number[] = [];
 
-    private _http: Http;
-    private _baseUrl: string;
+    private btnNext: HTMLInputElement;
+    private btnPrev: HTMLInputElement;
     
-    constructor(http: Http, @Inject('BASE_URL') baseUrl: string) {
-        this._http = http;
-        this._baseUrl = baseUrl;
-        this.getPage(0);
+    ngOnInit(): void {
+        this.itemCountOptions.push(10);
+        this.itemCountOptions.push(50);
+        this.itemCountOptions.push(100);
     }
+    
+    constructor(private _http: Http, @Inject('BASE_URL') private _baseUrl: string) {
+        this.getPage(0);
+    }    
 
     private getPage(pageNumber: number) {
         this._http.get(this._baseUrl + '/customer/getpagefiltered?resultsPerPage=' + this.itemsPerPage + '&page=' + pageNumber + '&filter=' + this.filter).subscribe(result => {
             this.customerPage = result.json() as CustomerPage;
-            (<HTMLInputElement>document.getElementById("btnNextPage")).disabled = (this.customerPage.pageNumber + 1) >= this.customerPage.totalPageCount;
-            (<HTMLInputElement>document.getElementById("btnPrevPage")).disabled = this.customerPage.pageNumber == 0;
+            this.getNextPageButton().disabled = (this.customerPage.pageNumber + 1) >= this.customerPage.totalPageCount;
+            this.getPrevPageButton().disabled = this.customerPage.pageNumber == 0;
         }, error => console.error(error));
     }
 
-    public showDetails(id: number) {
-        console.debug(id);
+    public getNextPageButton() {
+        if (!this.btnNext) {
+            this.btnNext = <HTMLInputElement>document.getElementById("btnNextPage");
+        }     
+
+        return this.btnNext;
+    }
+
+    public getPrevPageButton() {
+        if (!this.btnPrev) {
+            this.btnPrev = <HTMLInputElement>document.getElementById("btnPrevPage");
+        }
+
+        return this.btnPrev;
     }
 
     public delete(id: number) {
@@ -46,6 +64,10 @@ export class CustomerListComponent {
         if (this.customerPage.pageNumber > 0) {
             this.getPage(this.customerPage.pageNumber - 1);
         }
+    }
+
+    public onItemsPerPageChanged() {
+        this.getPage(0);
     }
 
     private getCurrentPageNumber() {

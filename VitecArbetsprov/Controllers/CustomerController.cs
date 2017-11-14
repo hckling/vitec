@@ -16,23 +16,24 @@ namespace VitecArbetsprov.Controllers
         private static List<Customer> _customers;
         private int _highestId = 0;
 
+        public CustomerController()
+        {
+            if (_customers == null)
+            {
+                ReadCustomers();
+            }
+        }
+
         // POST: Customer/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create([FromBody] Customer customer)
         {
             try
             {
-                Customer c = new Customer();
-
-                c.FirstName = collection["FirstName"];
-                c.LastName = collection["LastName"];
-                c.Category = collection["Category"];
-                c.SocialSecurityNumber = collection["SocialSecurityNumber"];
-
                 _highestId++;
+                customer.Id = _highestId;
 
-                c.Id = _highestId;
+                _customers.Add(customer);
 
                 return Ok();
             }
@@ -42,26 +43,20 @@ namespace VitecArbetsprov.Controllers
             }
         }
 
-        // POST: Customer/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult CustomerCount()
         {
-            try
-            {
-                // TODO: Add update logic here
-                Customer customer = _customers.Find(c => c.Id == id);
-                customer.FirstName = collection["FirstName"];
-                customer.LastName = collection["LastName"];
-                customer.Category = collection["Category"];
-                customer.SocialSecurityNumber = collection["SocialSecurityNumber"];
+            return new ObjectResult(_customers.Count);
+        }
 
-                return Ok();
-            }
-            catch
-            {
-                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-            }
+        public ActionResult PageCount(int itemsPerPage)
+        {
+            return new ObjectResult(Math.Ceiling((double)(_customers.Count / itemsPerPage)));
+        }
+
+        public ActionResult SaveChanges()
+        {
+            // TODO: Write to file
+            return Ok();
         }
 
         // GET: Customer/Delete/5
@@ -74,33 +69,18 @@ namespace VitecArbetsprov.Controllers
         [HttpGet]
         public ActionResult GetAll()
         {
-            if (_customers == null)
-            {
-                ReadCustomers();
-            }
-
             return new ObjectResult(_customers);
         }
 
         [HttpGet]
         public ActionResult GetPage(int resultsPerPage, int page)
         {
-            if (_customers == null)
-            {
-                ReadCustomers();
-            }
-
             return new ObjectResult(GetRange(_customers, page, resultsPerPage));
         }
 
         [HttpGet]
         public ActionResult GetPageFiltered(int resultsPerPage, int page, string filter)
         {
-            if (_customers == null)
-            {
-                ReadCustomers();
-            }
-
             if (filter.Length > 0)
             {
                 var filteredCustomers = _customers.Where(c => c.Matches(filter)).ToList<Customer>();
@@ -114,8 +94,8 @@ namespace VitecArbetsprov.Controllers
 
         private List<Customer> GetRange(List<Customer> customers, int page, int itemsPerPage)
         {
-            var startIndex = Math.Min(page * itemsPerPage, customers.Count - 1);
-            var length = Math.Min(itemsPerPage, customers.Count - 1 - startIndex);
+            var startIndex = Math.Max(Math.Min(page * itemsPerPage, customers.Count - 1), 0);
+            var length = Math.Min(itemsPerPage, customers.Count - startIndex);
 
             return customers.GetRange(startIndex, length);
         }

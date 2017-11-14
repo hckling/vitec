@@ -33,7 +33,7 @@ import { CustomerComponent } from './components/customer/customer.component';
             { path: 'counter', component: CounterComponent },
             { path: 'fetch-data', component: FetchDataComponent },
             { path: 'customer-list', component: CustomerListComponent },
-            { path: 'customer-info', component: CustomerComponent },
+            { path: 'create-customer', component: CustomerComponent },
             { path: '**', redirectTo: 'home' }
         ])
     ]

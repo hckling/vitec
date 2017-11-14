@@ -1,10 +1,11 @@
 ﻿<h1>Create customer</h1>
 
-<!--<form ng-submit="addCustomer()">
-    <p><strong>First name:</strong> <input type="text" required [(ng-model)]="customer.firstName" name="FirstName" #name="ngModel" /> </p>
-    <p><strong>Last name:</strong> <input type="text" required [(ng-model)]="customer.lastName" name="LastName" #name="ngModel" /> </p>
-    <p><strong>Social security number:</strong> <input type="text" required [(ng-model)]="customer.socialSecurityNumber" name="SocialSecurityNumber" #name="ngModel" /> </p>
-    <p><strong>Category:</strong> <input type="text" [(ng-model)]="customer.category" name="Category" #name="ngModel" /> </p>
+<form ng-submit="createCustomer()">
+    <p><strong>First name:</strong> <input type="text" required id="txtFirstName" /> </p>
+    <p><strong>Last name:</strong> <input type="text" required id="txtLastName" /> </p>
+    <p><strong>Social security number:</strong> <input type="text" required id="txtSocialSecurityNumber" /> </p>
+    <p><strong>Category:</strong> <input type="text" id="txtCategory" /> </p>
 
-    <button type="submit" (click)="addCustomer">Create</button>
-</form>-->
+    <button type="submit" (click)="createCustomer()">Add</button>
+</form>
+<p>{{ result }}</p>

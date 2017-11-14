@@ -104,10 +104,10 @@ namespace VitecArbetsprov.Controllers
             return new ObjectResult(customerPage);
         }
 
-        [HttpGet]
-        public ActionResult GetPageFiltered(int resultsPerPage, int page, string filter)
+        [HttpPost]
+        public ActionResult GetPageFiltered(int resultsPerPage, int page, [FromBody] CustomerFilter filter)
         {
-            if (filter != null && filter.Length > 0)
+            if (filter != null && !filter.IsEmpty())
             {
                 var filteredCustomers = _customers.Where(c => c.Matches(filter)).ToList<Customer>();
 

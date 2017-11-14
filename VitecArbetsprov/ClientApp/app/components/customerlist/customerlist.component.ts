@@ -1,5 +1,5 @@
 ﻿import { Component, Inject, OnInit } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Headers, RequestOptions } from '@angular/http';
 import { Customer } from '../customer/customer';
 
 @Component({
@@ -8,8 +8,9 @@ import { Customer } from '../customer/customer';
 })
 export class CustomerListComponent implements OnInit {    
     public customerPage: CustomerPage = new CustomerPage();
+    public customerFilter: CustomerFilter = new CustomerFilter('', '', '');
+
     public itemsPerPage: number = 10;
-    public filter: string = "";
     public itemCountOptions: number[] = [];
 
     private btnNext: HTMLInputElement;
@@ -26,11 +27,20 @@ export class CustomerListComponent implements OnInit {
     }    
 
     private getPage(pageNumber: number) {
-        this._http.get(this._baseUrl + '/customer/getpagefiltered?resultsPerPage=' + this.itemsPerPage + '&page=' + pageNumber + '&filter=' + this.filter).subscribe(result => {
+        let body = JSON.stringify(this.customerFilter);
+        let headers = new Headers({ 'Content-Type': 'application/json' });
+        let options = new RequestOptions({ headers: headers });
+
+        this._http.post(this._baseUrl + '/customer/getpagefiltered?resultsPerPage=' + this.itemsPerPage + '&page=' + pageNumber, body, options).subscribe(result => {
             this.customerPage = result.json() as CustomerPage;
             this.getNextPageButton().disabled = (this.customerPage.pageNumber + 1) >= this.customerPage.totalPageCount;
             this.getPrevPageButton().disabled = this.customerPage.pageNumber == 0;
         }, error => console.error(error));
+        /*this._http.get(this._baseUrl + '/customer/getpagefiltered?resultsPerPage=' + this.itemsPerPage + '&page=' + pageNumber + '&filter=' + this.customerFilter.nameFilter).subscribe(result => {
+            this.customerPage = result.json() as CustomerPage;
+            this.getNextPageButton().disabled = (this.customerPage.pageNumber + 1) >= this.customerPage.totalPageCount;
+            this.getPrevPageButton().disabled = this.customerPage.pageNumber == 0;
+        }, error => console.error(error));*/
     }
 
     public getNextPageButton() {
@@ -78,8 +88,6 @@ export class CustomerListComponent implements OnInit {
     }
 
     public applyFilter() {
-        this.filter = (<HTMLInputElement>document.getElementById('filter')).value;
-        console.debug(this.filter);
         this.getPage(0);
     }
 
@@ -87,6 +95,12 @@ export class CustomerListComponent implements OnInit {
         this._http.get(this._baseUrl + '/customer/savechanges').subscribe(result => {
             
         }, error => console.error(error));
+    }
+}
+
+class CustomerFilter {
+    constructor(public nameFilter: string, public ssnFilter: string, public categoryFilter: string) {
+
     }
 }
 

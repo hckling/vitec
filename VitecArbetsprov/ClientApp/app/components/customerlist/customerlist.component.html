@@ -3,8 +3,23 @@
 <p *ngIf="!customerPage"><em>Loading...</em></p>
 
 <form *ngIf="customerPage">
-    <input id="filter" type="text" name="filter" /> 
-    <button (click)="applyFilter()">Apply</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Social security number</th>
+                <th>Category</th>
+            </tr>            
+        </thead>
+        <tbody>
+            <tr>
+                <td><input id="nameFilter" type="text" [(ngModel)]="customerFilter.nameFilter" name="txtNameFilter" /></td>
+                <td><input id="socialSecurityNumber" type="text" [(ngModel)]="customerFilter.ssnFilter" name="txtSSN" /></td>
+                <td><input id="category" type="text" [(ngModel)]="customerFilter.categoryFilter" name="txtCategory" /></td>
+                <td><button (click)="applyFilter()">Apply</button></td>
+            </tr>
+        </tbody>
+    </table>
 </form>
 
 <table class='table' *ngIf="customerPage">

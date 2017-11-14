@@ -25,10 +25,13 @@ namespace VitecArbetsprov.Model
         [XmlElement("PersonCategory")]
         public string Category { get; set; }
 
-        public bool Matches(string filter)
+        public bool Matches(CustomerFilter filter)
         {
             var fullName = String.Format("{0} {1}", FirstName, LastName);
-            return fullName.StartsWith(filter, StringComparison.InvariantCultureIgnoreCase);
+
+            return fullName.StartsWith(filter.NameFilter, StringComparison.InvariantCultureIgnoreCase) && 
+                SocialSecurityNumber.StartsWith(filter.SsnFilter, StringComparison.InvariantCultureIgnoreCase) && 
+                Category.StartsWith(filter.CategoryFilter, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

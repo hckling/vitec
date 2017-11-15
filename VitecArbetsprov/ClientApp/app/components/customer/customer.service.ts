@@ -1,6 +1,6 @@
 ﻿import { Injectable, Inject } from '@angular/core';
 import { Http, Headers, RequestOptions } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable, ObservableInput } from 'rxjs/Observable';
 import { of } from 'rxjs/Observable/of';
 import { Customer } from './customer';
 import { CustomerPage } from '../customerlist/customerpage';
@@ -13,6 +13,14 @@ import 'rxjs/add/operator/map'
 export class CustomerService {
     constructor(private http: Http, @Inject('BASE_URL') private baseUrl: string) { }
 
+    private _serverError(err: any) {
+        console.log('sever error:', err);  // debug
+        if (err instanceof Response) {
+            return Observable.throw(err.json() || 'backend server error');            
+        }
+        return Observable.throw(err || 'backend server error');
+    }
+
     getPage(page: number, itemsPerPage: number, filter: CustomerFilter): Observable<CustomerPage> {
         let body = JSON.stringify(filter);
         let headers = new Headers({ 'Content-Type': 'application/json' });
@@ -20,7 +28,8 @@ export class CustomerService {
         let resultPage = new CustomerPage();
 
         return this.http.post(this.baseUrl + '/customer/getpagefiltered?resultsPerPage=' + itemsPerPage + '&page=' + page, body, options)
-            .map(result => result.json() as CustomerPage);
+            .map(result => result.json() as CustomerPage)
+            .catch(this._serverError);
     }
 
     delete(id: number): Observable<any> {
@@ -28,7 +37,7 @@ export class CustomerService {
     }
 
     saveChanges() {
-        this.http.get(this.baseUrl + '/customer/savechanges').subscribe(result => { }, error => console.error(error));
+        this.http.get(this.baseUrl + '/customer/savechanges').subscribe(result => { }, error => { console.debug("Heyaaaa!"); console.error(error); });
     }
 
     addCustomer(customer: Customer): Observable<Customer> {

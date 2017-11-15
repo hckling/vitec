@@ -24,10 +24,7 @@ export class CustomerListComponent implements OnInit {
         this.itemCountOptions.push(50);
         this.itemCountOptions.push(100);
 
-        this.customerService.getPage(0, this.itemsPerPage, this.customerFilter).subscribe(page => {
-            this.customerPage = page;
-            this.updateButtonAvailability();
-        }, error => console.error(error));
+        this.getPage(0);
     }
 
     constructor(private customerService: CustomerService) { }
@@ -36,7 +33,10 @@ export class CustomerListComponent implements OnInit {
         this.customerService.getPage(pageNumber, this.itemsPerPage, this.customerFilter).subscribe(page => {
             this.customerPage = page;
             this.updateButtonAvailability();
-        }, error => console.error(error));        
+        }, error => {
+            console.debug("Error retrieving page...");
+            console.error(error);
+        });
     }
 
     private updateButtonAvailability() {
@@ -54,11 +54,13 @@ export class CustomerListComponent implements OnInit {
     }
 
     public nextPage() {
-        this.getPage(this.customerPage.pageNumber + 1);
+        if (!this.atLastPage) {
+            this.getPage(this.customerPage.pageNumber + 1);
+        }
     }
     
     public previousPage() {
-        if (this.customerPage.pageNumber > 0) {
+        if (!this.atFirstPage) {
             this.getPage(this.customerPage.pageNumber - 1);
         }
     }

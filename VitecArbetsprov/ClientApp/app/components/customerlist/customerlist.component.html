@@ -43,12 +43,12 @@
 </table>
 
 <div>
-    <button (click)="previousPage()" id="btnPrevPage">Previous</button> 
+    <button (click)="previousPage()" id="btnPrevPage" [disabled]="atFirstPage">Previous</button> 
     Page: {{ customerPage.pageNumber + 1 }} of {{ customerPage.totalPageCount }}, 
     items per page: 
     <select id="cmbItemsPerPage" [(ngModel)]="itemsPerPage" (ngModelChange)="onItemsPerPageChanged()">
         <option *ngFor="let itemCount of itemCountOptions" [value]="itemCount" [selected]="itemCount == itemsPerPage">{{ itemCount }}</option>
     </select> 
     <button (click)="nextPage()" id="btnNextPage" [disabled]="atLastPage" >Next</button>
-    <button (click)="saveChanges()" [disabled]="atFirstPage" id="btnSaveChanges">Save changes</button>
+    <button (click)="saveChanges()" id="btnSaveChanges">Save changes</button>
 </div>

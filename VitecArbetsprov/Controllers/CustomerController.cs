@@ -17,31 +17,6 @@ namespace VitecArbetsprov.Controllers
         private static List<Customer> _customers;
         private static int _highestId = 0;
 
-        public CustomerController()
-        {
-            if (_customers == null)
-            {
-                ReadCustomersFromFile();
-            }
-        }
-
-        [HttpPost]
-        public ActionResult Create([FromBody] Customer customer)
-        {
-            try
-            {
-                UpdateCustomerId(customer);
-
-                _customers.Add(customer);
-
-                return new ObjectResult(customer);
-            }
-            catch
-            {
-                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-            }
-        }
-
         private void UpdateCustomerId(Customer customer)
         {
             _highestId++;
@@ -52,20 +27,12 @@ namespace VitecArbetsprov.Controllers
         {
             if (resultsPerPage > 1)
             {
-                return (int) Math.Ceiling((double)(_customers.Count / resultsPerPage));
+                return (int)Math.Ceiling((double)(_customers.Count / resultsPerPage));
             }
             else
             {
                 return _customers.Count;
             }
-        }
-
-        [HttpGet]
-        public ActionResult SaveChanges()
-        {
-            SaveCustomersToFile();
-
-            return Ok();
         }
 
         private static void SaveCustomersToFile()
@@ -77,6 +44,49 @@ namespace VitecArbetsprov.Controllers
             {
                 serializer.Serialize(fs, _customers);
             }
+        }
+
+        private List<Customer> GetCustomersOnPage(List<Customer> customers, int page, int itemsPerPage)
+        {
+            var startIndex = Math.Max(Math.Min(page * itemsPerPage, customers.Count - 1), 0);
+            var length = Math.Min(itemsPerPage, customers.Count - startIndex);
+
+            return customers.GetRange(startIndex, length);
+        }
+
+        private void ReadCustomersFromFile()
+        {
+            using (StreamReader reader = new StreamReader(REPOSITORY_PATH))
+            {
+                var serializer = new XmlSerializer(typeof(List<Customer>), new XmlRootAttribute("ArrayOfPerson"));
+                _customers = (List<Customer>)serializer.Deserialize(reader);
+                _highestId = _customers.OrderByDescending(item => item.Id).First().Id;
+            }
+        }
+
+        public CustomerController()
+        {
+            if (_customers == null)
+            {
+                ReadCustomersFromFile();
+            }
+        }
+
+        [HttpPost]
+        public ActionResult Create([FromBody] Customer customer)
+        {
+            UpdateCustomerId(customer);
+            _customers.Add(customer);
+
+            return new ObjectResult(customer);
+        }        
+
+        [HttpGet]
+        public ActionResult SaveChanges()
+        {
+            SaveCustomersToFile();
+
+            return Ok();
         }
 
         [HttpGet]
@@ -122,24 +132,6 @@ namespace VitecArbetsprov.Controllers
                 var totalNumberOfPages = (int) Math.Ceiling((float)_customers.Count / resultsPerPage);
 
                 return new ObjectResult(new CustomerPage(customersOnPage, page, totalNumberOfPages));
-            }
-        }
-
-        private List<Customer> GetCustomersOnPage(List<Customer> customers, int page, int itemsPerPage)
-        {
-            var startIndex = Math.Max(Math.Min(page * itemsPerPage, customers.Count - 1), 0);
-            var length = Math.Min(itemsPerPage, customers.Count - startIndex);
-
-            return customers.GetRange(startIndex, length);
-        }
-
-        private void ReadCustomersFromFile()
-        {
-            using (StreamReader reader = new StreamReader(REPOSITORY_PATH))
-            {
-                var serializer = new XmlSerializer(typeof(List<Customer>), new XmlRootAttribute("ArrayOfPerson"));
-                _customers = (List<Customer>)serializer.Deserialize(reader);
-                _highestId = _customers.OrderByDescending(item => item.Id).First().Id;
             }
         }
     }
